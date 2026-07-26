@@ -1,0 +1,40 @@
+{
+  "name": "@stylec/cli",
+  "version": "0.0.1",
+  "type": "module",
+  "bin": {
+    "stylec": "./dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json --watch",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@stylec/compiler": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "typescript": "^7.0.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anuoua/stylec.git",
+    "directory": "packages/cli"
+  },
+  "homepage": "https://github.com/anuoua/stylec/tree/main/packages/cli",
+  "bugs": {
+    "url": "https://github.com/anuoua/stylec/issues"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "name": "@stylec/ts-plugin",
+  "version": "0.0.1",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json --watch",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@jridgewell/trace-mapping": "^0.3.31"
+  },
+  "devDependencies": {
+    "@stylec/compiler": "workspace:*",
+    "@types/node": "^26.1.1",
+    "typescript": "^7.0.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anuoua/stylec.git",
+    "directory": "packages/ts-plugin"
+  },
+  "homepage": "https://github.com/anuoua/stylec/tree/main/packages/ts-plugin",
+  "bugs": {
+    "url": "https://github.com/anuoua/stylec/issues"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "name": "@stylec/runtime",
+  "version": "0.0.1",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json --watch",
+    "test": "node --test"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anuoua/stylec.git",
+    "directory": "packages/runtime"
+  },
+  "homepage": "https://github.com/anuoua/stylec/tree/main/packages/runtime",
+  "bugs": {
+    "url": "https://github.com/anuoua/stylec/issues"
+  }
+}
