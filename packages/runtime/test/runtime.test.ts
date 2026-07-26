@@ -19,6 +19,12 @@ test("__hash is stable for empty input", () => {
   assert.equal(__hash(""), __hash(""));
 });
 
+test("__hash distinguishes chars that share a low byte", () => {
+  assert.notEqual(__hash("a"), __hash("\u0161"));
+  assert.notEqual(__hash("你好"), __hash("伀好"));
+  assert.equal(__hash("你好"), __hash("你好"));
+});
+
 test("__toDecl converts camelCase to kebab-case", () => {
   assert.equal(
     __toDecl({ color: "red", fontWeight: "bold", backgroundColor: "x" }),
