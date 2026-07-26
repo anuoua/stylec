@@ -1,9 +1,50 @@
 export function __hash(input: string): string {
-  let h = 0x811c9dc5;
-  for (let i = 0; i < input.length; i++) {
-    h ^= input.charCodeAt(i);
-    h = Math.imul(h, 0x01000193);
+  const bytes = new TextEncoder().encode(input);
+  const len = bytes.length;
+  const rem = len & 3;
+  const limit = len - rem;
+
+  const c1 = 0xcc9e2d51;
+  const c2 = 0x1b873593;
+
+  let h = 0;
+  let i = 0;
+
+  while (i < limit) {
+    let k =
+      (bytes[i] ?? 0) |
+      ((bytes[i + 1] ?? 0) << 8) |
+      ((bytes[i + 2] ?? 0) << 16) |
+      ((bytes[i + 3] ?? 0) << 24);
+    i += 4;
+
+    k = Math.imul(k, c1);
+    k = (k << 15) | (k >>> 17);
+    k = Math.imul(k, c2);
+
+    h ^= k;
+    h = (h << 13) | (h >>> 19);
+    h = (Math.imul(h, 5) + 0xe6546b64) | 0;
   }
+
+  let k = 0;
+  if (rem === 3) k ^= (bytes[i + 2] ?? 0) << 16;
+  if (rem >= 2) k ^= (bytes[i + 1] ?? 0) << 8;
+  if (rem >= 1) {
+    k ^= bytes[i] ?? 0;
+    k = Math.imul(k, c1);
+    k = (k << 15) | (k >>> 17);
+    k = Math.imul(k, c2);
+    h ^= k;
+  }
+
+  h ^= len;
+  h ^= h >>> 16;
+  h = Math.imul(h, 0x85ebca6b);
+  h ^= h >>> 13;
+  h = Math.imul(h, 0xc2b2ae35);
+  h ^= h >>> 16;
+
   return (h >>> 0).toString(36);
 }
 
