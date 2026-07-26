@@ -21,6 +21,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "packageManager": "pnpm@10.23.0",
   "repository": {
     "type": "git",
