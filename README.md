@@ -4,13 +4,13 @@ Compile-time CSS-in-JS. Write normal CSS in `*.stylec.css`; the compiler emits a
 
 ## Packages
 
-| package             | what                                                                 |
-| ------------------- | -------------------------------------------------------------------- |
-| `@stylec/compiler`  | core: `compile(source, { filename })` → `{ code, map, hash, names }` |
-| `@stylec/runtime`   | tiny helpers (`__hash`, `__toDecl`) used by generated modules        |
-| `@stylec/cli`       | `stylec <file-or-dir> [--watch]`                                     |
-| `@stylec/vite`      | Vite plugin (watch + HMR)                                            |
-| `@stylec/ts-plugin` | go-to-def jumps from `classes.x` into the `.stylec.css`              |
+| package             | what                                                                     |
+| ------------------- | ------------------------------------------------------------------------ |
+| `@stylec/compiler`  | core: `compile(source, { filename })` → `{ code, map, hash, names }`     |
+| `@stylec/runtime`   | tiny helpers (`__hash`, `__toDecl`) used by generated modules            |
+| `@stylec/cli`       | `stylec <file-or-dir> [--watch]`                                         |
+| `@stylec/vite`      | Vite plugin (compiles `.stylec.css` → sibling `.stylec.ts`, watch + HMR) |
+| `@stylec/ts-plugin` | go-to-def jumps from `classes.x` into the `.stylec.css`                  |
 
 ## Install
 
@@ -49,14 +49,14 @@ export function override(patch) {
 Use it:
 
 ```ts
-import { classes } from "./Button.stylec.js";
+import { classes } from "./Button.stylec.ts";
 <button className={classes.button} />;
 ```
 
 ## override (scoped variants)
 
 ```ts
-import { classes, override } from "./Button.stylec.js";
+import { classes, override } from "./Button.stylec.ts";
 
 // module scope — computed once
 const green = override({ button: { color: "green" } });
@@ -85,10 +85,16 @@ Use CSS custom properties in the CSS and set them upstream — no special API:
 import { defineConfig } from "vite";
 import stylec from "@stylec/vite";
 
-export default defineConfig({ plugins: [stylec()] });
+export default defineConfig({
+  plugins: [stylec({ include: ["src"] })],
+});
 ```
 
-Edits to a `.stylec.css` hot-reload.
+`include` is a list of directories (relative to the current working directory) to scan and watch; it defaults to `["src"]`. On `vite dev` and `vite build`, every `.stylec.css` under those roots is compiled to a sibling `.stylec.ts` — the same file the CLI emits. Creating or editing a `.stylec.css` recompiles it on the fly; the changed `.stylec.ts` then hot-reloads through Vite's normal pipeline. Import the emitted module as in the CLI flow:
+
+```ts
+import { classes } from "./Button.stylec.ts";
+```
 
 ## Go-to-definition
 
@@ -104,8 +110,6 @@ Add to `tsconfig.json` (consumers on TS ≤5.x):
 
 cmd-click `classes.button` → jumps to `.button` in the CSS.
 
-## Tests
+## License
 
-```sh
-pnpm test   # builds all packages, then runs node:test across the workspace
-```
+[MIT](./LICENSE) © [anuoua](https://github.com/anuoua)

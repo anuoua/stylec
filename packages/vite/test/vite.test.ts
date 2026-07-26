@@ -5,6 +5,14 @@ import { join } from "node:path";
 import { EventEmitter } from "node:events";
 import { stylec, outPath, findInputs, compileFile, compileAll } from "../dist/index.js";
 
+type FakeWatcher = EventEmitter & { add(): void };
+
+function runConfigureServer(plugin: ReturnType<typeof stylec>, watcher: FakeWatcher) {
+  (plugin.configureServer as unknown as (server: { watcher: FakeWatcher }) => void)({
+    watcher,
+  });
+}
+
 const tmp = join(import.meta.dirname, "__vite_fixture__");
 
 beforeEach(() => {
@@ -59,11 +67,8 @@ test("configureServer recompiles on watcher change and add", () => {
   const css = join(tmp, "watch.stylec.css");
   writeFileSync(css, ".x { color: red; }");
   const watcher = Object.assign(new EventEmitter(), { add() {} });
-  const server = { watcher } as unknown as Parameters<
-    NonNullable<ReturnType<ReturnType<typeof stylec>["configureServer"]>>
-  >[0];
   const p = stylec({ include: [tmp] });
-  p.configureServer!(server);
+  runConfigureServer(p, watcher);
   writeFileSync(css, ".y { color: green; }");
   watcher.emit("change", css);
   assert.match(readFileSync(outPath(css), "utf8"), /y: "s_y_/);
@@ -79,11 +84,8 @@ test("configureServer ignores files outside include roots", () => {
   writeFileSync(inside, ".i { color: red; }");
   writeFileSync(outside, ".o { color: red; }");
   const watcher = Object.assign(new EventEmitter(), { add() {} });
-  const server = { watcher } as unknown as Parameters<
-    NonNullable<ReturnType<ReturnType<typeof stylec>["configureServer"]>>
-  >[0];
   const p = stylec({ include: [tmp] });
-  p.configureServer!(server);
+  runConfigureServer(p, watcher);
   watcher.emit("add", outside);
   assert.equal(existsSync(outPath(outside)), false);
   rmSync(outside, { force: true });

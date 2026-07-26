@@ -2,6 +2,7 @@
   "name": "@stylec/cli",
   "version": "0.0.2",
   "type": "module",
+  "license": "MIT",
   "bin": {
     "stylec": "./dist/index.js"
   },
@@ -17,8 +18,8 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "dev": "tsc -p tsconfig.json --watch",
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "tsc -p tsconfig.build.json --watch",
     "test": "node --test"
   },
   "dependencies": {

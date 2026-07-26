@@ -130,7 +130,7 @@ test("with srcFile -> sourcemap maps the classes token back to its CSS position"
   const lines = code.split("\n");
   const entryLineIdx = lines.findIndex((l) => l.includes('button: "s_button_'));
   assert.ok(entryLineIdx >= 0);
-  const col = lines[entryLineIdx].indexOf("button");
+  const col = lines[entryLineIdx]!.indexOf("button");
   const orig = originalPositionFor(new TraceMap(map), {
     line: entryLineIdx + 1,
     column: col,
