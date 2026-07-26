@@ -1,36 +1,90 @@
-import { test, after } from "node:test";
+import { test, after, beforeEach } from "node:test";
 import assert from "node:assert/strict";
-import { writeFileSync, mkdirSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { stylec } from "../dist/index.js";
+import { EventEmitter } from "node:events";
+import { stylec, outPath, findInputs, compileFile, compileAll } from "../dist/index.js";
 
 const tmp = join(import.meta.dirname, "__vite_fixture__");
 
-test("resolveId maps a .stylec.css specifier to a virtual id", () => {
+beforeEach(() => {
+  rmSync(tmp, { recursive: true, force: true });
   mkdirSync(tmp, { recursive: true });
-  const importer = join(tmp, "app.ts");
-  const p = stylec();
-  const r = p.resolveId.call({}, "./x.stylec.css", importer);
-  assert.equal(r, "\0stylec:" + join(tmp, "x.stylec.css"));
-});
-
-test("load compiles the css, returns JS, and registers a watch file", () => {
-  mkdirSync(tmp, { recursive: true });
-  const cssPath = join(tmp, "x.stylec.css");
-  writeFileSync(cssPath, ".btn { color: red; }");
-  const p = stylec();
-  const watched = [];
-  const ctx = { addWatchFile: (f) => watched.push(f) };
-  const r = p.load.call(ctx, "\0stylec:" + cssPath);
-  assert.ok(r && typeof r.code === "string");
-  assert.match(r.code, /export const classes/);
-  assert.match(r.code, /btn: "s_btn_/);
-  assert.deepEqual(watched, [cssPath]);
-});
-
-test("resolveId leaves non-stylec specifiers alone", () => {
-  const p = stylec();
-  assert.equal(p.resolveId.call({}, "./foo.ts", join(tmp, "app.ts")), null);
 });
 
 after(() => rmSync(tmp, { recursive: true, force: true }));
+
+test("outPath swaps .stylec.css -> .stylec.ts", () => {
+  assert.equal(outPath("/a/b/Foo.stylec.css"), "/a/b/Foo.stylec.ts");
+});
+
+test("findInputs walks dirs and lists only .stylec.css", () => {
+  writeFileSync(join(tmp, "a.stylec.css"), ".a { color: red; }");
+  mkdirSync(join(tmp, "sub"));
+  writeFileSync(join(tmp, "sub/b.stylec.css"), ".b { color: blue; }");
+  writeFileSync(join(tmp, "ignore.css"), "x {}");
+  const found = findInputs(tmp);
+  assert.equal(found.length, 2);
+});
+
+test("compileFile writes a sibling .stylec.ts with hashed classes", () => {
+  const css = join(tmp, "c.stylec.css");
+  writeFileSync(css, ".btn { color: red; }");
+  assert.equal(compileFile(css), true);
+  const out = outPath(css);
+  assert.equal(existsSync(out), true);
+  const code = readFileSync(out, "utf8");
+  assert.match(code, /export const classes/);
+  assert.match(code, /btn: "s_btn_/);
+});
+
+test("compileAll compiles every .stylec.css under the given roots", () => {
+  writeFileSync(join(tmp, "a.stylec.css"), ".a { color: red; }");
+  mkdirSync(join(tmp, "sub"));
+  writeFileSync(join(tmp, "sub/b.stylec.css"), ".b { color: blue; }");
+  const n = compileAll([tmp]);
+  assert.equal(n, 2);
+  assert.equal(existsSync(outPath(join(tmp, "a.stylec.css"))), true);
+  assert.equal(existsSync(outPath(join(tmp, "sub/b.stylec.css"))), true);
+});
+
+test("buildStart compiles all .stylec.css under include", () => {
+  writeFileSync(join(tmp, "a.stylec.css"), ".a { color: red; }");
+  const p = stylec({ include: [tmp] });
+  (p.buildStart as (this: unknown) => void).call({});
+  assert.equal(existsSync(outPath(join(tmp, "a.stylec.css"))), true);
+});
+
+test("configureServer recompiles on watcher change and add", () => {
+  const css = join(tmp, "watch.stylec.css");
+  writeFileSync(css, ".x { color: red; }");
+  const watcher = Object.assign(new EventEmitter(), { add() {} });
+  const server = { watcher } as unknown as Parameters<
+    NonNullable<ReturnType<ReturnType<typeof stylec>["configureServer"]>>
+  >[0];
+  const p = stylec({ include: [tmp] });
+  p.configureServer!(server);
+  writeFileSync(css, ".y { color: green; }");
+  watcher.emit("change", css);
+  assert.match(readFileSync(outPath(css), "utf8"), /y: "s_y_/);
+  const css2 = join(tmp, "added.stylec.css");
+  writeFileSync(css2, ".z { color: blue; }");
+  watcher.emit("add", css2);
+  assert.equal(existsSync(outPath(css2)), true);
+});
+
+test("configureServer ignores files outside include roots", () => {
+  const inside = join(tmp, "in.stylec.css");
+  const outside = join(tmp, "..", "out.stylec.css");
+  writeFileSync(inside, ".i { color: red; }");
+  writeFileSync(outside, ".o { color: red; }");
+  const watcher = Object.assign(new EventEmitter(), { add() {} });
+  const server = { watcher } as unknown as Parameters<
+    NonNullable<ReturnType<ReturnType<typeof stylec>["configureServer"]>>
+  >[0];
+  const p = stylec({ include: [tmp] });
+  p.configureServer!(server);
+  watcher.emit("add", outside);
+  assert.equal(existsSync(outPath(outside)), false);
+  rmSync(outside, { force: true });
+});
