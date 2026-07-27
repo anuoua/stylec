@@ -19,8 +19,8 @@ async function loadCompiled(source: string) {
 
 test("generated module exports classes, css, default", async () => {
   const mod = await loadCompiled(SRC);
-  assert.match(mod.classes.button, /^s_button_/);
-  assert.match(mod.classes.icon, /^s_icon_/);
+  assert.match(mod.classes.button, /^button_/);
+  assert.match(mod.classes.icon, /^icon_/);
   assert.equal(mod.default, mod.classes);
   assert.equal(typeof mod.css, "string");
   assert.ok(mod.css.includes("." + mod.classes.button));
@@ -30,7 +30,7 @@ test("override produces a scoped (new-hash) class", async () => {
   const mod = await loadCompiled(SRC);
   const v = mod.override({ button: { color: "green" } });
   assert.notEqual(v.classes.button, mod.classes.button);
-  assert.match(v.classes.button, /^s_button_/);
+  assert.match(v.classes.button, /^button_/);
 });
 
 test("override is deterministic for the same patch", async () => {

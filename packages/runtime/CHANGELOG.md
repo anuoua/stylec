@@ -1,5 +1,11 @@
 # @stylec/runtime
 
+## 0.0.4
+
+### Patch Changes
+
+- drop s_ prefix type-check override via CSSProperties
+
 ## 0.0.3
 
 ### Patch Changes

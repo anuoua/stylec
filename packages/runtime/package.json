@@ -1,6 +1,6 @@
 {
   "name": "@stylec/runtime",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "type": "module",
   "license": "MIT",
   "main": "./dist/index.js",
@@ -31,5 +31,8 @@
   "homepage": "https://github.com/anuoua/stylec/tree/main/packages/runtime",
   "bugs": {
     "url": "https://github.com/anuoua/stylec/issues"
+  },
+  "dependencies": {
+    "csstype": "^3.2.3"
   }
 }

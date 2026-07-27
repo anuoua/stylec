@@ -20,12 +20,12 @@ test("hash equals the content hash of the source", () => {
 
 test("generate is deterministic", () => {
   const a = generate({
-    templateBody: ".s_a_" + P + "{}",
+    templateBody: ".a_" + P + "{}",
     classes: ci("a"),
     source: "x",
   });
   const b = generate({
-    templateBody: ".s_a_" + P + "{}",
+    templateBody: ".a_" + P + "{}",
     classes: ci("a"),
     source: "x",
   });
@@ -34,7 +34,7 @@ test("generate is deterministic", () => {
 });
 
 test("each placeholder becomes one ${h} interpolation", () => {
-  const body = ".s_a_" + P + "{x:1}.s_b_" + P + "{y:2}.s_a_" + P + "{}";
+  const body = ".a_" + P + "{x:1}.b_" + P + "{y:2}.a_" + P + "{}";
   const { code } = generate({
     templateBody: body,
     classes: ci("a", "b"),
@@ -50,8 +50,8 @@ test("classes object bakes the hash into each name", () => {
     classes: ci("a", "b"),
     source,
   });
-  assert.ok(code.includes(`  a: "s_a_${hash}",`));
-  assert.ok(code.includes(`  b: "s_b_${hash}",`));
+  assert.ok(code.includes(`  a: "a_${hash}",`));
+  assert.ok(code.includes(`  b: "b_${hash}",`));
 });
 
 test("emits classes in first-appearance order and ClassName as keyof typeof classes", () => {
@@ -72,7 +72,7 @@ test("empty classes -> no hashed entries, ClassName still keyof-derived", () => 
     source: "s",
   });
   assert.match(code, /export type ClassName = keyof typeof classes;/);
-  assert.ok(!code.includes("s_"));
+  assert.match(code, /classes = \{\s*\} as const/);
   assert.ok(!code.includes("_names"));
 });
 
@@ -84,14 +84,14 @@ test("override emits one patch line per name and an out entry per name", () => {
   });
   assert.match(
     code,
-    /if \(patch\.a\) extra \+= "\.s_a_" \+ h \+ "\{" \+ __toDecl\(patch\.a\) \+ "\}";/,
+    /if \(patch\.a\) extra \+= "\.a_" \+ h \+ "\{" \+ __toDecl\(patch\.a\) \+ "\}";/,
   );
   assert.match(
     code,
-    /if \(patch\.b\) extra \+= "\.s_b_" \+ h \+ "\{" \+ __toDecl\(patch\.b\) \+ "\}";/,
+    /if \(patch\.b\) extra \+= "\.b_" \+ h \+ "\{" \+ __toDecl\(patch\.b\) \+ "\}";/,
   );
-  assert.match(code, /a: "s_a_" \+ h,/);
-  assert.match(code, /b: "s_b_" \+ h,/);
+  assert.match(code, /a: "a_" \+ h,/);
+  assert.match(code, /b: "b_" \+ h,/);
 });
 
 test("non-identifier name uses quoted key and bracket access", () => {
@@ -100,9 +100,9 @@ test("non-identifier name uses quoted key and bracket access", () => {
     classes: ci("my-btn"),
     source: "s",
   });
-  assert.ok(code.includes('"my-btn": "s_my-btn_'));
+  assert.ok(code.includes('"my-btn": "my-btn_'));
   assert.ok(code.includes('if (patch["my-btn"])'));
-  assert.ok(code.includes('"my-btn": "s_my-btn_" + h,'));
+  assert.ok(code.includes('"my-btn": "my-btn_" + h,'));
 });
 
 test("no srcFile -> no sourcemap", () => {
@@ -128,7 +128,7 @@ test("with srcFile -> sourcemap maps the classes token back to its CSS position"
   assert.deepEqual(map.names, ["button"]);
 
   const lines = code.split("\n");
-  const entryLineIdx = lines.findIndex((l) => l.includes('button: "s_button_'));
+  const entryLineIdx = lines.findIndex((l) => l.includes('button: "button_'));
   assert.ok(entryLineIdx >= 0);
   const col = lines[entryLineIdx]!.indexOf("button");
   const orig = originalPositionFor(new TraceMap(map), {
@@ -155,7 +155,7 @@ async function loadGenerated(templateBody: string, names: string[], source: stri
 test("template body with ${, backtick and backslash is escaped and round-trips", async () => {
   const backtick = String.fromCharCode(96);
   const inner = backtick + "${y}" + "\\z";
-  const body = ".s_a_" + P + '{content:"' + inner + '"}';
+  const body = ".a_" + P + '{content:"' + inner + '"}';
   const mod = await loadGenerated(body, ["a"], ".a{}");
   assert.ok(mod.css.includes(backtick), "backtick round-trips");
   assert.ok(mod.css.includes("${y}"), "${ round-trips");
@@ -163,7 +163,7 @@ test("template body with ${, backtick and backslash is escaped and round-trips",
 });
 
 test("override with empty patch returns _tmpl at a new hash", async () => {
-  const mod = await loadGenerated(".s_a_" + P + "{x:1}", ["a"], ".a{x:1}");
+  const mod = await loadGenerated(".a_" + P + "{x:1}", ["a"], ".a{x:1}");
   const v = mod.override({});
   assert.ok(v.css.includes("." + v.classes.a));
   assert.equal(v.css.includes("color:green"), false);

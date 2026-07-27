@@ -27,7 +27,7 @@ function defAt(fileName: string, offset: number, name: string, len = name.length
 
 test("redirects a classes property def to the CSS class name", () => {
   const { code, source, host } = setup();
-  const off = code.indexOf('button: "s_button_');
+  const off = code.indexOf('button: "button_');
   assert.ok(off >= 0);
   const out = resolveStylecDefinition(host, defAt(tsFile, off, "button"));
   assert.ok(out);
@@ -39,7 +39,7 @@ test("redirects a classes property def to the CSS class name", () => {
 
 test("redirects an override out entry too", () => {
   const { code, source, host } = setup();
-  const off = code.indexOf('button: "s_button_" + h');
+  const off = code.indexOf('button: "button_" + h');
   assert.ok(off >= 0);
   const out = resolveStylecDefinition(host, defAt(tsFile, off, "button"));
   assert.ok(out);
@@ -49,10 +49,10 @@ test("redirects an override out entry too", () => {
 
 test("resolves even when landing on the value (same line as the property)", () => {
   const { code, source, host } = setup();
-  const propLine = code.indexOf('button: "s_button_');
-  const valueOff = code.indexOf("s_button_", propLine);
+  const propLine = code.indexOf('button: "button_');
+  const valueOff = code.indexOf("button_", propLine);
   assert.ok(valueOff >= 0);
-  const out = resolveStylecDefinition(host, defAt(tsFile, valueOff, "s_button_"));
+  const out = resolveStylecDefinition(host, defAt(tsFile, valueOff, "button_"));
   assert.ok(out);
   assert.equal(out!.fileName, cssFile);
   assert.equal(out!.textSpan.start, source.indexOf("button"));

@@ -28,7 +28,7 @@ test("compileAll writes sibling .stylec.ts with hashed classes", () => {
   assert.ok(n >= 1);
   const out = readFileSync(join(tmp, "c.stylec.ts"), "utf8");
   assert.match(out, /export const classes/);
-  assert.match(out, /btn: "s_btn_/);
+  assert.match(out, /btn: "btn_/);
 });
 
 test("compileFile returns false on a read error", () => {
