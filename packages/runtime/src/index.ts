@@ -1,3 +1,9 @@
+import type { Properties } from "csstype";
+
+export type CSSProperties = Properties & {
+  [key: `-${string}`]: string | number | undefined;
+};
+
 export function __hash(input: string): string {
   const bytes = new TextEncoder().encode(input);
   const len = bytes.length;
@@ -48,11 +54,12 @@ export function __hash(input: string): string {
   return (h >>> 0).toString(36);
 }
 
-export function __toDecl(obj: Record<string, string>): string {
+export function __toDecl(obj: CSSProperties): string {
   let out = "";
-  for (const key in obj) {
-    if (!Object.prototype.hasOwnProperty.call(obj, key)) continue;
-    const val = obj[key];
+  const rec = obj as Record<string, string | number | undefined>;
+  for (const key in rec) {
+    if (!Object.prototype.hasOwnProperty.call(rec, key)) continue;
+    const val = rec[key];
     if (val === undefined) continue;
     const kebab = key.replace(/[A-Z]/g, (m) => "-" + m.toLowerCase());
     out += kebab + ":" + val + ";";

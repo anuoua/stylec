@@ -36,6 +36,10 @@ test("__toDecl handles empty object", () => {
   assert.equal(__toDecl({}), "");
 });
 
-test("__toDecl preserves already-kebab keys", () => {
-  assert.equal(__toDecl({ "font-size": "12px" }), "font-size:12px;");
+test("__toDecl stringifies number values without units", () => {
+  assert.equal(__toDecl({ zIndex: 10, opacity: 0.5 }), "z-index:10;opacity:0.5;");
+});
+
+test("__toDecl passes through custom properties", () => {
+  assert.equal(__toDecl({ "--gap": "8px" }), "--gap:8px;");
 });
