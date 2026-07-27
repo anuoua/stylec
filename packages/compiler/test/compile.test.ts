@@ -14,7 +14,7 @@ test("dedupes repeated class names", () => {
   const { names, code } = compile(".a { color: red; } .a:hover { color: blue; }");
   assert.deepEqual(names, ["a"]);
   // two occurrences in the template both get ${h}
-  assert.equal((code.match(/s_a_\$\{h\}/g) ?? []).length, 2);
+  assert.equal((code.match(/a_\$\{h\}/g) ?? []).length, 2);
 });
 
 test("finds nested classes", () => {
@@ -32,8 +32,8 @@ test("preserves var() verbatim", () => {
 test("all classes share the file content hash", () => {
   const src = ".a { x: 1; } .b { y: 2; }";
   const { code, hash } = compile(src);
-  assert.ok(code.includes(`"s_a_${hash}"`));
-  assert.ok(code.includes(`"s_b_${hash}"`));
+  assert.ok(code.includes(`"a_${hash}"`));
+  assert.ok(code.includes(`"b_${hash}"`));
 });
 
 test("hash changes when content changes", () => {
@@ -45,7 +45,7 @@ test("hash is stable for identical content", () => {
 });
 
 test("selectors keep the leading dot", () => {
-  assert.match(compile(".a { color: red; }").code, /\.s_a_\$\{h\}/);
+  assert.match(compile(".a { color: red; }").code, /\.a_\$\{h\}/);
 });
 
 test("generated code declares the expected exports", () => {
@@ -61,7 +61,7 @@ test("no classes still yields a valid module", () => {
   const { code, names } = compile("@media (min-width: 0) { * { color: red; } }");
   assert.deepEqual(names, []);
   assert.match(code, /export type ClassName = keyof typeof classes;/);
-  assert.ok(!code.includes("s_"));
+  assert.match(code, /classes = \{\s*\} as const/);
 });
 
 test("with filename, output ends with an inline base64 sourcemap", () => {

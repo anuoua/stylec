@@ -19,7 +19,7 @@ export function compile(source: string, options?: CompileOptions): CompileResult
 
   const s = new MagicString(source);
   for (const occ of occurrences) {
-    s.overwrite(occ.start, occ.end, `s_${occ.name}_${HASH_PLACEHOLDER}`);
+    s.overwrite(occ.start, occ.end, `${occ.name}_${HASH_PLACEHOLDER}`);
   }
   const templateBody = s.toString();
 

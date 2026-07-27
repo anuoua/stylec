@@ -39,8 +39,8 @@ npx stylec src --watch
 emits `Button.stylec.ts`:
 
 ```ts
-export const css = ".s_button_<hash>:hover{color:blue}...";
-export const classes: Record<ClassName, string> = { button: "s_button_<hash>" };
+export const css = ".button_<hash>:hover{color:blue}...";
+export const classes: Record<ClassName, string> = { button: "button_<hash>" };
 export function override(patch) {
   /* ... */
 }

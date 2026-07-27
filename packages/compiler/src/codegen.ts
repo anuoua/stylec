@@ -105,7 +105,7 @@ export function generate(input: CodegenInput): CodegenResult {
   for (const c of classInfo) {
     b.push("  ");
     b.push(safeKey(c.name), src(c));
-    b.push(`: "s_${c.name}_${hash}",\n`);
+    b.push(`: "${c.name}_${hash}",\n`);
   }
   b.push("} as const;\n");
   b.push("export type ClassName = keyof typeof classes;\n");
@@ -116,13 +116,13 @@ export function generate(input: CodegenInput): CodegenResult {
   b.push('  let extra = "";\n');
   for (const c of classInfo) {
     const a = access(c.name);
-    b.push(`  if (patch${a}) extra += ".s_${c.name}_" + h + "{" + __toDecl(patch${a}) + "}";\n`);
+    b.push(`  if (patch${a}) extra += ".${c.name}_" + h + "{" + __toDecl(patch${a}) + "}";\n`);
   }
   b.push("  const out = {\n");
   for (const c of classInfo) {
     b.push("    ");
     b.push(safeKey(c.name), src(c));
-    b.push(`: "s_${c.name}_" + h,\n`);
+    b.push(`: "${c.name}_" + h,\n`);
   }
   b.push("  };\n");
   b.push("  return { css: _tmpl(h) + extra, classes: out };\n");

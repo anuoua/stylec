@@ -43,7 +43,7 @@ test("compileFile writes a sibling .stylec.ts with hashed classes", () => {
   assert.equal(existsSync(out), true);
   const code = readFileSync(out, "utf8");
   assert.match(code, /export const classes/);
-  assert.match(code, /btn: "s_btn_/);
+  assert.match(code, /btn: "btn_/);
 });
 
 test("compileAll compiles every .stylec.css under the given roots", () => {
@@ -71,7 +71,7 @@ test("configureServer recompiles on watcher change and add", () => {
   runConfigureServer(p, watcher);
   writeFileSync(css, ".y { color: green; }");
   watcher.emit("change", css);
-  assert.match(readFileSync(outPath(css), "utf8"), /y: "s_y_/);
+  assert.match(readFileSync(outPath(css), "utf8"), /y: "y_/);
   const css2 = join(tmp, "added.stylec.css");
   writeFileSync(css2, ".z { color: blue; }");
   watcher.emit("add", css2);
