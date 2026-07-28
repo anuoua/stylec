@@ -1,5 +1,11 @@
 # @stylec/ts-plugin
 
+## 0.0.6
+
+### Patch Changes
+
+- Just plus one
+
 ## 0.0.5
 
 ### Patch Changes
