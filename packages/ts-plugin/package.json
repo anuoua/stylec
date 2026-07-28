@@ -1,6 +1,6 @@
 {
   "name": "@stylec/ts-plugin",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "license": "MIT",
   "main": "./dist/plugin.js",
   "types": "./dist/index.d.ts",
