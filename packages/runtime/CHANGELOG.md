@@ -1,5 +1,11 @@
 # @stylec/runtime
 
+## 0.0.5
+
+### Patch Changes
+
+- Fix ts-plugin & export cssHash
+
 ## 0.0.4
 
 ### Patch Changes

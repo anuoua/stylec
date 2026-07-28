@@ -128,7 +128,10 @@ export function create(info: PluginCreateInfo): LanguageServiceLike {
     ls.getDefinitionAtPosition = (fileName: string, position: number) => {
       const defs = priorDef(fileName, position);
       if (!defs) return defs;
-      return defs.map((d) => resolveStylecDefinition(host, d) ?? d);
+      return defs.map((d) => {
+        if (!d.fileName.endsWith(".stylec.ts")) return d;
+        return resolveStylecDefinition(host, d) ?? d;
+      });
     };
   }
 
@@ -139,7 +142,10 @@ export function create(info: PluginCreateInfo): LanguageServiceLike {
       if (!res || !res.definitions) return res;
       return {
         textSpan: res.textSpan,
-        definitions: res.definitions.map((d) => resolveStylecDefinition(host, d) ?? d),
+        definitions: res.definitions.map((d) => {
+          if (!d.fileName.endsWith(".stylec.ts")) return d;
+          return resolveStylecDefinition(host, d) ?? d;
+        }),
       };
     };
   }

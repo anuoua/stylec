@@ -4,6 +4,7 @@
 
 ### Patch Changes
 
+- Fix ts-plugin & export cssHash
 - 446e1a6: Change to require
 
 ## 0.0.4
