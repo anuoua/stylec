@@ -1,5 +1,13 @@
 # @stylec/vite
 
+## 0.0.6
+
+### Patch Changes
+
+- Just plus one
+- Updated dependencies
+  - @stylec/compiler@0.0.6
+
 ## 0.0.5
 
 ### Patch Changes
