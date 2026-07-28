@@ -1,0 +1,29 @@
+name: Release VS Code Extension
+
+on:
+  workflow_dispatch:
+
+jobs:
+  publish:
+    name: Publish to Marketplace
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: packages/vscode
+
+      - name: Publish
+        run: npx @vscode/vsce publish
+        working-directory: packages/vscode
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}

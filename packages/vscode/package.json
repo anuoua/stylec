@@ -1,0 +1,23 @@
+{
+  "name": "stylec-vscode",
+  "displayName": "Stylec",
+  "description": "Go-to-definition from generated .stylec.ts classes to .stylec.css sources",
+  "publisher": "anuoua",
+  "version": "0.0.1",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": ["Programming Languages"],
+  "contributes": {
+    "typescriptServerPlugins": [
+      {
+        "name": "@stylec/ts-plugin",
+        "enableForWorkspaceTypeScriptVersions": true
+      }
+    ]
+  },
+  "dependencies": {
+    "@stylec/ts-plugin": "^0.0.6"
+  }
+}
