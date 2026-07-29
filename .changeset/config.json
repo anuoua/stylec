@@ -3,7 +3,7 @@
   "changelog": "@changesets/cli/changelog",
   "commit": false,
   "fixed": [
-    ["@stylec/runtime", "@stylec/compiler", "@stylec/cli", "@stylec/vite", "@stylec/ts-plugin"]
+    ["@stylec/runtime", "@stylec/compiler", "@stylec/cli", "@stylec/vite"]
   ],
   "linked": [],
   "access": "public",
