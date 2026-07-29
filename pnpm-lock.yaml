@@ -93,6 +93,9 @@ importers:
 
   packages/vite:
     dependencies:
+      '@stylec/cli':
+        specifier: workspace:*
+        version: link:../cli
       '@stylec/compiler':
         specifier: workspace:*
         version: link:../compiler

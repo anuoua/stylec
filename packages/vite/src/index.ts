@@ -1,50 +1,27 @@
-import { readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
-import { basename, isAbsolute, join, relative, resolve } from "node:path";
+import { isAbsolute, relative, resolve } from "node:path";
 import type { Plugin } from "vite";
-import { compile } from "@stylec/compiler";
+import {
+  compileFile,
+  compileAll as cliCompileAll,
+  findNodeModulesBin,
+  outPath,
+  findInputs,
+  type FormatConfig,
+} from "@stylec/cli";
+
+export { outPath, findInputs, compileFile };
+export type { FormatConfig };
 
 export interface StylecOptions {
   include?: string[];
+  format?: string;
 }
 
-export function outPath(cssFile: string): string {
-  return cssFile.replace(/\.stylec\.css$/, ".stylec.ts");
-}
-
-export function findInputs(input: string): string[] {
-  const st = statSync(input);
-  if (st.isFile()) return [input];
-  const out: string[] = [];
-  const walk = (dir: string) => {
-    for (const entry of readdirSync(dir)) {
-      if (entry === "node_modules" || entry === "dist") continue;
-      const p = join(dir, entry);
-      const s = statSync(p);
-      if (s.isDirectory()) walk(p);
-      else if (p.endsWith(".stylec.css")) out.push(p);
-    }
-  };
-  walk(input);
-  return out;
-}
-
-export function compileFile(file: string): boolean {
-  try {
-    const source = readFileSync(file, "utf8");
-    const { code } = compile(source, { filename: basename(file) });
-    writeFileSync(outPath(file), code);
-    return true;
-  } catch (e) {
-    console.error(`error compiling ${file}: ${(e as Error).message}`);
-    return false;
-  }
-}
-
-export function compileAll(inputs: string[]): number {
+export function compileAll(inputs: string[], format?: FormatConfig): number {
   let n = 0;
   for (const input of inputs) {
     try {
-      for (const f of findInputs(resolve(input))) if (compileFile(f)) n++;
+      n += cliCompileAll(input, format);
     } catch {
       // input path missing — skip
     }
@@ -59,19 +36,27 @@ function isInside(file: string, dir: string): boolean {
 
 export function stylec(options?: StylecOptions): Plugin {
   const include = options?.include ?? ["src"];
+  const format: FormatConfig | undefined = options?.format
+    ? { command: options.format, binPath: findNodeModulesBin() }
+    : undefined;
   return {
     name: "stylec",
     enforce: "pre",
     buildStart() {
-      compileAll(include);
+      compileAll(include, format);
     },
     configureServer(server) {
       const roots = include.map((d) => resolve(d));
       server.watcher.add(roots);
+      let timer: ReturnType<typeof setTimeout> | null = null;
       const handle = (filepath: string) => {
         if (!filepath.endsWith(".stylec.css")) return;
         if (!roots.some((r) => isInside(filepath, r))) return;
-        compileFile(filepath);
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(() => {
+          timer = null;
+          compileFile(filepath, format);
+        }, 100);
       };
       server.watcher.on("add", handle);
       server.watcher.on("change", handle);
