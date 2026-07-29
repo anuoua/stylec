@@ -106,7 +106,7 @@ stylec src --watch --format "prettier --write {path}"
 ```
 
 ```ts
-stylec({ include: ["src"], format: "prettier --write {path}" })
+stylec({ include: ["src"], format: "prettier --write {path}" });
 ```
 
 Project-local binaries in `node_modules/.bin` are found automatically — no `npx` needed.

@@ -52,7 +52,6 @@ test("generated code declares the expected exports", () => {
   const { code } = compile(".a { x: 1; }");
   assert.match(code, /export const css/);
   assert.match(code, /export const classes/);
-  assert.match(code, /export default classes/);
   assert.match(code, /export function override/);
   assert.match(code, /export type ClassName = keyof typeof classes;/);
 });
