@@ -63,7 +63,7 @@ test("buildStart compiles all .stylec.css under include", () => {
   assert.equal(existsSync(outPath(join(tmp, "a.stylec.css"))), true);
 });
 
-test("configureServer recompiles on watcher change and add", () => {
+test("configureServer recompiles on watcher change and add", async () => {
   const css = join(tmp, "watch.stylec.css");
   writeFileSync(css, ".x { color: red; }");
   const watcher = Object.assign(new EventEmitter(), { add() {} });
@@ -71,10 +71,12 @@ test("configureServer recompiles on watcher change and add", () => {
   runConfigureServer(p, watcher);
   writeFileSync(css, ".y { color: green; }");
   watcher.emit("change", css);
+  await new Promise((r) => setTimeout(r, 150));
   assert.match(readFileSync(outPath(css), "utf8"), /y: "y_/);
   const css2 = join(tmp, "added.stylec.css");
   writeFileSync(css2, ".z { color: blue; }");
   watcher.emit("add", css2);
+  await new Promise((r) => setTimeout(r, 150));
   assert.equal(existsSync(outPath(css2)), true);
 });
 

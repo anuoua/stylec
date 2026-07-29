@@ -1,6 +1,6 @@
 {
   "name": "@stylec/vite",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "type": "module",
   "license": "MIT",
   "main": "./dist/index.js",
@@ -20,6 +20,7 @@
     "test": "node --test"
   },
   "dependencies": {
+    "@stylec/cli": "workspace:*",
     "@stylec/compiler": "workspace:*"
   },
   "peerDependencies": {

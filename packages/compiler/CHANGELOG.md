@@ -1,5 +1,13 @@
 # @stylec/compiler
 
+## 0.0.7
+
+### Patch Changes
+
+- Refact and add format feature
+- Updated dependencies
+  - @stylec/runtime@0.0.7
+
 ## 0.0.6
 
 ### Patch Changes
