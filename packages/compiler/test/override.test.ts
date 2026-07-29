@@ -17,11 +17,10 @@ async function loadCompiled(source: string) {
   }
 }
 
-test("generated module exports classes, css, default", async () => {
+test("generated module exports classes, css", async () => {
   const mod = await loadCompiled(SRC);
   assert.match(mod.classes.button, /^button_/);
   assert.match(mod.classes.icon, /^icon_/);
-  assert.equal(mod.default, mod.classes);
   assert.equal(typeof mod.css, "string");
   assert.ok(mod.css.includes("." + mod.classes.button));
 });

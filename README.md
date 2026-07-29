@@ -8,9 +8,10 @@ Compile-time CSS-in-JS. Write normal CSS in `*.stylec.css`; the compiler emits a
 | ------------------- | ------------------------------------------------------------------------ |
 | `@stylec/compiler`  | core: `compile(source, { filename })` → `{ code, map, hash, names }`     |
 | `@stylec/runtime`   | tiny helpers (`__hash`, `__toDecl`) used by generated modules            |
-| `@stylec/cli`       | `stylec <file-or-dir> [--watch]`                                         |
+| `@stylec/cli`       | `stylec <file-or-dir> [--watch] [--format <cmd>]`                        |
 | `@stylec/vite`      | Vite plugin (compiles `.stylec.css` → sibling `.stylec.ts`, watch + HMR) |
 | `@stylec/ts-plugin` | go-to-def jumps from `classes.x` into the `.stylec.css`                  |
+| `stylec-vscode`     | VS Code extension — bundles the ts-plugin, zero config                   |
 
 ## Install
 
@@ -96,19 +97,25 @@ export default defineConfig({
 import { classes } from "./Button.stylec.ts";
 ```
 
-## Go-to-definition
+## Formatting
 
-Add to `tsconfig.json` (consumers on TS ≤5.x):
+Pass a format command to run after each generated file is written. `{path}` is replaced with the `.stylec.ts` path:
 
-```json
-{
-  "compilerOptions": {
-    "plugins": [{ "name": "@stylec/ts-plugin" }]
-  }
-}
+```sh
+stylec src --watch --format "prettier --write {path}"
 ```
 
-cmd-click `classes.button` → jumps to `.button` in the CSS.
+```ts
+stylec({ include: ["src"], format: "prettier --write {path}" });
+```
+
+Project-local binaries in `node_modules/.bin` are found automatically — no `npx` needed.
+
+## Go-to-definition
+
+cmd-click `classes.button` in a `.stylec.ts` → jumps to the `.button` rule in the source `.stylec.css`.
+
+**VS Code** — install the [Stylec](https://marketplace.visualstudio.com/items?itemName=anuoua.stylec-vscode) extension.
 
 ## License
 

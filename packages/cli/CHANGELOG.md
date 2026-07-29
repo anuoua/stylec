@@ -1,5 +1,13 @@
 # @stylec/cli
 
+## 0.0.8
+
+### Patch Changes
+
+- Remove export default
+- Updated dependencies
+  - @stylec/compiler@0.0.8
+
 ## 0.0.7
 
 ### Patch Changes

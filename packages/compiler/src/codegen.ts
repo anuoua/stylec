@@ -108,8 +108,7 @@ export function generate(input: CodegenInput): CodegenResult {
     b.push(`: "${c.name}_${hash}",\n`);
   }
   b.push("} as const;\n");
-  b.push("export type ClassName = keyof typeof classes;\n");
-  b.push("export default classes;\n\n");
+  b.push("export type ClassName = keyof typeof classes;\n\n");
 
   b.push("export function override(patch: Partial<Record<ClassName, CSSProperties>>) {\n");
   b.push("  const h = __hash(cssHash + JSON.stringify(patch));\n");
