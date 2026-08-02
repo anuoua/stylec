@@ -78,10 +78,6 @@ function safeKey(name: string): string {
   return /^[A-Za-z_$][\w$]*$/.test(name) ? name : JSON.stringify(name);
 }
 
-function access(name: string): string {
-  return /^[A-Za-z_$][\w$]*$/.test(name) ? "." + name : "[" + JSON.stringify(name) + "]";
-}
-
 export function generate(input: CodegenInput): CodegenResult {
   const hash = __hash(input.source);
   const parts = input.templateBody.split(HASH_PLACEHOLDER);
@@ -112,18 +108,20 @@ export function generate(input: CodegenInput): CodegenResult {
 
   b.push("export function override(patch: Partial<Record<ClassName, CSSProperties>>) {\n");
   b.push("  const h = __hash(cssHash + JSON.stringify(patch));\n");
-  b.push('  let extra = "";\n');
-  for (const c of classInfo) {
-    const a = access(c.name);
-    b.push(`  if (patch${a}) extra += ".${c.name}_" + h + "{" + __toDecl(patch${a}) + "}";\n`);
-  }
-  b.push("  const out = {\n");
+  b.push("  const names = [\n");
   for (const c of classInfo) {
     b.push("    ");
-    b.push(safeKey(c.name), src(c));
-    b.push(`: "${c.name}_" + h,\n`);
+    b.push(JSON.stringify(c.name), src(c));
+    b.push(",\n");
   }
-  b.push("  };\n");
+  b.push("  ] as const;\n");
+  b.push("  const out = {} as Record<(typeof names)[number], string>;\n");
+  b.push('  let extra = "";\n');
+  b.push("  for (const name of names) {\n");
+  b.push('    out[name] = name + "_" + h;\n');
+  b.push("    const decl = patch[name];\n");
+  b.push('    if (decl) extra += "." + name + "_" + h + "{" + __toDecl(decl) + "}";\n');
+  b.push("  }\n");
   b.push("  return { css: _tmpl(h) + extra, classes: out, cssHash: h };\n");
   b.push("}\n");
 

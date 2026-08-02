@@ -76,33 +76,27 @@ test("empty classes -> no hashed entries, ClassName still keyof-derived", () => 
   assert.ok(!code.includes("_names"));
 });
 
-test("override emits one patch line per name and an out entry per name", () => {
+test("override lists names once and builds extra/out in a loop", () => {
   const { code } = generate({
     templateBody: "x",
     classes: ci("a", "b"),
     source: "s",
   });
-  assert.match(
-    code,
-    /if \(patch\.a\) extra \+= "\.a_" \+ h \+ "\{" \+ __toDecl\(patch\.a\) \+ "\}";/,
-  );
-  assert.match(
-    code,
-    /if \(patch\.b\) extra \+= "\.b_" \+ h \+ "\{" \+ __toDecl\(patch\.b\) \+ "\}";/,
-  );
-  assert.match(code, /a: "a_" \+ h,/);
-  assert.match(code, /b: "b_" \+ h,/);
+  assert.match(code, /const names = \[\n    "a",\n    "b",\n  \] as const;/);
+  assert.match(code, /for \(const name of names\)/);
+  assert.match(code, /if \(decl\) extra \+= "\." \+ name \+ "_" \+ h \+ "\{" \+ __toDecl\(decl\) \+ "\}";/);
+  assert.match(code, /out\[name\] = name \+ "_" \+ h;/);
 });
 
-test("non-identifier name uses quoted key and bracket access", () => {
+test("non-identifier name appears as a quoted string in the names list", () => {
   const { code } = generate({
     templateBody: "x",
     classes: ci("my-btn"),
     source: "s",
   });
+  assert.ok(code.includes('    "my-btn",'));
   assert.ok(code.includes('"my-btn": "my-btn_'));
-  assert.ok(code.includes('if (patch["my-btn"])'));
-  assert.ok(code.includes('"my-btn": "my-btn_" + h,'));
+  assert.ok(!code.includes('patch["my-btn"]'));
 });
 
 test("no srcFile -> no sourcemap", () => {
@@ -128,7 +122,7 @@ test("with srcFile -> sourcemap maps the classes token back to its CSS position"
   assert.deepEqual(map.names, ["button"]);
 
   const lines = code.split("\n");
-  const entryLineIdx = lines.findIndex((l) => l.includes('button: "button_'));
+  const entryLineIdx = lines.findIndex((l) => l.includes('"button",'));
   assert.ok(entryLineIdx >= 0);
   const col = lines[entryLineIdx]!.indexOf("button");
   const orig = originalPositionFor(new TraceMap(map), {
