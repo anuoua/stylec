@@ -1,5 +1,11 @@
 # @stylec/runtime
 
+## 0.0.10
+
+### Patch Changes
+
+- Derive override names from classes
+
 ## 0.0.9
 
 ### Patch Changes
