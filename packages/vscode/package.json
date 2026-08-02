@@ -3,7 +3,7 @@
   "displayName": "Stylec",
   "description": "Go-to-definition from generated .stylec.ts classes to .stylec.css sources",
   "publisher": "anuoua",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "license": "MIT",
   "icon": "icon.png",
   "engines": {
@@ -21,6 +21,6 @@
     ]
   },
   "dependencies": {
-    "@stylec/ts-plugin": "^0.0.6"
+    "@stylec/ts-plugin": "^0.0.7"
   }
 }
