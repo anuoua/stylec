@@ -106,15 +106,8 @@ export function generate(input: CodegenInput): CodegenResult {
   b.push("} as const;\n");
   b.push("export type ClassName = keyof typeof classes;\n\n");
 
-  b.push("const __names = [\n");
-  for (const c of classInfo) {
-    b.push("    ");
-    b.push(JSON.stringify(c.name), src(c));
-    b.push(",\n");
-  }
-  b.push("  ] as const;\n\n");
   b.push("export function override(patch: Partial<Record<ClassName, CSSProperties>>) {\n");
-  b.push("  return __override(__names, _tmpl, cssHash, patch);\n");
+  b.push("  return __override(Object.keys(classes) as ClassName[], _tmpl, cssHash, patch);\n");
   b.push("}\n");
 
   const code = b.toString();

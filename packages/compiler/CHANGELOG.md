@@ -1,5 +1,13 @@
 # @stylec/compiler
 
+## 0.0.10
+
+### Patch Changes
+
+- Derive override names from classes
+- Updated dependencies
+  - @stylec/runtime@0.0.10
+
 ## 0.0.9
 
 ### Patch Changes
