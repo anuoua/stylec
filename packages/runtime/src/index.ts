@@ -66,3 +66,20 @@ export function __toDecl(obj: CSSProperties): string {
   }
   return out;
 }
+
+export function __override<T extends string>(
+  names: readonly T[],
+  tmpl: (h: string) => string,
+  cssHash: string,
+  patch: Partial<Record<T, CSSProperties>>,
+): { css: string; classes: Record<T, string>; cssHash: string } {
+  const h = __hash(cssHash + JSON.stringify(patch));
+  const classes = {} as Record<T, string>;
+  let extra = "";
+  for (const name of names) {
+    classes[name] = name + "_" + h;
+    const decl = patch[name];
+    if (decl) extra += "." + name + "_" + h + "{" + __toDecl(decl) + "}";
+  }
+  return { css: tmpl(h) + extra, classes, cssHash: h };
+}

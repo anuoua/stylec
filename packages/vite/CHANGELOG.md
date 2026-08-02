@@ -1,5 +1,14 @@
 # @stylec/vite
 
+## 0.0.9
+
+### Patch Changes
+
+- Shrink override() codegen with a loop
+- Updated dependencies
+  - @stylec/compiler@0.0.9
+  - @stylec/cli@0.0.9
+
 ## 0.0.8
 
 ### Patch Changes
