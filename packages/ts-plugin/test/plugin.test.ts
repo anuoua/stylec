@@ -37,16 +37,6 @@ test("redirects a classes property def to the CSS class name", () => {
   assert.equal(out!.textSpan.length, "button".length);
 });
 
-test("redirects an override __names entry too", () => {
-  const { code, source, host } = setup();
-  const off = code.indexOf('"button",');
-  assert.ok(off >= 0);
-  const out = resolveStylecDefinition(host, defAt(tsFile, off, "button"));
-  assert.ok(out);
-  assert.equal(out!.fileName, cssFile);
-  assert.equal(out!.textSpan.start, source.indexOf("button"));
-});
-
 test("resolves even when landing on the value (same line as the property)", () => {
   const { code, source, host } = setup();
   const propLine = code.indexOf('button: "button_');
