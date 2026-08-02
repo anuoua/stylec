@@ -61,7 +61,6 @@ test("emits classes in first-appearance order and ClassName as keyof typeof clas
     source: "s",
   });
   assert.match(code, /export type ClassName = keyof typeof classes;/);
-  assert.ok(!code.includes("_names"));
   assert.ok(code.indexOf("card") < code.indexOf("title"));
 });
 
@@ -73,19 +72,18 @@ test("empty classes -> no hashed entries, ClassName still keyof-derived", () => 
   });
   assert.match(code, /export type ClassName = keyof typeof classes;/);
   assert.match(code, /classes = \{\s*\} as const/);
-  assert.ok(!code.includes("_names"));
+  assert.match(code, /const __names = \[\s*\] as const;/);
 });
 
-test("override lists names once and builds extra/out in a loop", () => {
+test("override delegates to the runtime helper with the module's names and template", () => {
   const { code } = generate({
     templateBody: "x",
     classes: ci("a", "b"),
     source: "s",
   });
-  assert.match(code, /const names = \[\n    "a",\n    "b",\n  \] as const;/);
-  assert.match(code, /for \(const name of names\)/);
-  assert.match(code, /if \(decl\) extra \+= "\." \+ name \+ "_" \+ h \+ "\{" \+ __toDecl\(decl\) \+ "\}";/);
-  assert.match(code, /out\[name\] = name \+ "_" \+ h;/);
+  assert.match(code, /import \{ __override, type CSSProperties \} from "@stylec\/runtime";/);
+  assert.match(code, /const __names = \[\n    "a",\n    "b",\n  \] as const;/);
+  assert.match(code, /return __override\(__names, _tmpl, cssHash, patch\);/);
 });
 
 test("non-identifier name appears as a quoted string in the names list", () => {

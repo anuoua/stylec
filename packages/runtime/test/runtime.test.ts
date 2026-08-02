@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { __hash, __toDecl } from "../dist/index.js";
+import { __hash, __toDecl, __override } from "../dist/index.js";
 
 test("__hash is deterministic", () => {
   assert.equal(__hash("hello"), __hash("hello"));
@@ -42,4 +42,37 @@ test("__toDecl stringifies number values without units", () => {
 
 test("__toDecl passes through custom properties", () => {
   assert.equal(__toDecl({ "--gap": "8px" }), "--gap:8px;");
+});
+
+const tmpl = (h: string) => `.main_${h}{color:red}.title_${h}{color:blue}`;
+
+test("__override returns one class per name plus base css at a new hash", () => {
+  const v = __override(["main", "title"], tmpl, "abc", {});
+  assert.match(v.cssHash, /^[0-9a-z]+$/);
+  assert.notEqual(v.cssHash, "abc");
+  assert.equal(v.classes.main, "main_" + v.cssHash);
+  assert.equal(v.classes.title, "title_" + v.cssHash);
+  assert.ok(v.css.includes("." + v.classes.main + "{color:red}"));
+  assert.ok(v.css.includes("." + v.classes.title + "{color:blue}"));
+  assert.ok(!v.css.includes("green"));
+});
+
+test("__override appends declarations only for patched classes", () => {
+  const v = __override(["main", "title"], tmpl, "abc", { title: { color: "green" } });
+  assert.ok(v.css.includes("." + v.classes.title + "{color:green;}"));
+  assert.ok(!v.css.includes("main_" + v.cssHash + "{color:green;}"));
+});
+
+test("__override is deterministic for the same patch", () => {
+  const patch = { main: { color: "green" } };
+  const a = __override(["main"], tmpl, "abc", patch);
+  const b = __override(["main"], tmpl, "abc", patch);
+  assert.equal(a.cssHash, b.cssHash);
+  assert.equal(a.css, b.css);
+});
+
+test("__override with a different patch yields a different hash", () => {
+  const a = __override(["main"], tmpl, "abc", { main: { color: "green" } });
+  const b = __override(["main"], tmpl, "abc", { main: { color: "blue" } });
+  assert.notEqual(a.cssHash, b.cssHash);
 });

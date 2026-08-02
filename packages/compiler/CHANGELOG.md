@@ -1,5 +1,13 @@
 # @stylec/compiler
 
+## 0.0.9
+
+### Patch Changes
+
+- Shrink override() codegen with a loop
+- Updated dependencies
+  - @stylec/runtime@0.0.9
+
 ## 0.0.8
 
 ### Patch Changes
