@@ -37,6 +37,28 @@ test("redirects a classes property def to the CSS class name", () => {
   assert.equal(out!.textSpan.length, "button".length);
 });
 
+test("redirects a def for override(...).classes.xxx (lands on the classes object keys)", () => {
+  const { code, source, host } = setup();
+  const off = code.indexOf('icon: "icon_');
+  assert.ok(off >= 0);
+  const out = resolveStylecDefinition(host, defAt(tsFile, off, "icon"));
+  assert.ok(out);
+  assert.equal(out!.fileName, cssFile);
+  assert.equal(out!.name, "icon");
+  assert.equal(out!.textSpan.start, source.indexOf("icon"));
+});
+
+test("override return type is keyed off typeof classes so property defs resolve to classes keys", () => {
+  const { code, host } = setup();
+  assert.match(
+    code,
+    /return __override\(Object\.keys\(classes\) as ClassName\[\], _tmpl, cssHash, patch\) as \{\n\s+css: string;\n\s+classes: \{ \[K in keyof typeof classes\]: string \};\n\s+cssHash: string;\n\s+\};/,
+  );
+  const off = code.indexOf("override(patch");
+  assert.ok(off >= 0);
+  assert.equal(resolveStylecDefinition(host, defAt(tsFile, off, "override")), undefined);
+});
+
 test("resolves even when landing on the value (same line as the property)", () => {
   const { code, source, host } = setup();
   const propLine = code.indexOf('button: "button_');

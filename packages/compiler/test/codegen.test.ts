@@ -74,7 +74,7 @@ test("empty classes -> no hashed entries, ClassName still keyof-derived", () => 
   assert.match(code, /classes = \{\s*\} as const/);
   assert.match(
     code,
-    /return __override\(Object\.keys\(classes\) as ClassName\[\], _tmpl, cssHash, patch\);/,
+    /return __override\(Object\.keys\(classes\) as ClassName\[\], _tmpl, cssHash, patch\) as \{\n\s+css: string;\n\s+classes: \{ \[K in keyof typeof classes\]: string \};\n\s+cssHash: string;\n\s+\};/,
   );
 });
 
@@ -87,7 +87,7 @@ test("override derives names from classes and delegates to the runtime helper", 
   assert.match(code, /import \{ __override, type CSSProperties \} from "@stylec\/runtime";/);
   assert.match(
     code,
-    /return __override\(Object\.keys\(classes\) as ClassName\[\], _tmpl, cssHash, patch\);/,
+    /return __override\(Object\.keys\(classes\) as ClassName\[\], _tmpl, cssHash, patch\) as \{\n\s+css: string;\n\s+classes: \{ \[K in keyof typeof classes\]: string \};\n\s+cssHash: string;\n\s+\};/,
   );
 });
 
